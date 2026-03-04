@@ -38,9 +38,11 @@ def run_services():
 
     except KeyboardInterrupt:
         print("\n--- 正在停止所有服务 ---")
-        # 杀掉子进程
-        p_mqtt.terminate()
-        p_server.terminate()
+        # 杀掉子进程（检查变量是否存在）
+        if 'p_mqtt' in locals():
+            p_mqtt.terminate()
+        if 'p_server' in locals():
+            p_server.terminate()
         print("已停止。")
 
 if __name__ == "__main__":

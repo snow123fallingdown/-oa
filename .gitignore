@@ -1,9 +1,15 @@
+# Python虚拟环境
+venv/
+env/
+.venv/
 /backend/venv
-/backend/.idea
+
+# IDE
 .idea
-
-.history/
+/backend/.idea
 .vscode/
-web/package-lock.json
+.history/
 
-*.batvenv/
+# 其他
+web/package-lock.json
+*.bat
