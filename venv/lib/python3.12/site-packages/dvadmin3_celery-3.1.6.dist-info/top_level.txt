@@ -1,0 +1,2 @@
+django_celery_results
+dvadmin3_celery

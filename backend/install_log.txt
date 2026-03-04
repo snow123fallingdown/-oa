@@ -1,0 +1,70 @@
+Using pip 23.2.1 from /Users/wangtan/workcode/django-vue3-admin-master/django-vue3-admin-master/venv/lib/python3.12/site-packages/pip (python 3.12)
+Collecting mysqlclient==2.2.7
+  Using cached mysqlclient-2.2.7.tar.gz (91 kB)
+  Installing build dependencies: started
+  Running command pip subprocess to install build dependencies
+  Collecting setuptools>=61
+    Obtaining dependency information for setuptools>=61 from https://files.pythonhosted.org/packages/e1/c6/76dc613121b793286a3f91621d7b75a2b493e0390ddca50f11993eadf192/setuptools-82.0.0-py3-none-any.whl.metadata
+    Using cached setuptools-82.0.0-py3-none-any.whl.metadata (6.6 kB)
+  Using cached setuptools-82.0.0-py3-none-any.whl (1.0 MB)
+  Installing collected packages: setuptools
+  Successfully installed setuptools-82.0.0
+
+  [notice] A new release of pip is available: 23.2.1 -> 26.0.1
+  [notice] To update, run: pip install --upgrade pip
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Running command Getting requirements to build wheel
+  /bin/sh: pkg-config: command not found
+  /bin/sh: pkg-config: command not found
+  /bin/sh: pkg-config: command not found
+  /bin/sh: pkg-config: command not found
+  Trying pkg-config --exists mysqlclient
+  Command 'pkg-config --exists mysqlclient' returned non-zero exit status 127.
+  Trying pkg-config --exists mariadb
+  Command 'pkg-config --exists mariadb' returned non-zero exit status 127.
+  Trying pkg-config --exists libmariadb
+  Command 'pkg-config --exists libmariadb' returned non-zero exit status 127.
+  Trying pkg-config --exists perconaserverclient
+  Command 'pkg-config --exists perconaserverclient' returned non-zero exit status 127.
+  Traceback (most recent call last):
+    File "/Users/wangtan/workcode/django-vue3-admin-master/django-vue3-admin-master/venv/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 353, in <module>
+      main()
+    File "/Users/wangtan/workcode/django-vue3-admin-master/django-vue3-admin-master/venv/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 335, in main
+      json_out['return_val'] = hook(**hook_input['kwargs'])
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/Users/wangtan/workcode/django-vue3-admin-master/django-vue3-admin-master/venv/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 118, in get_requires_for_build_wheel
+      return hook(config_settings)
+             ^^^^^^^^^^^^^^^^^^^^^
+    File "/private/var/folders/kb/19zphszs2vb8kdn6tn7bxnz00000gn/T/pip-build-env-xhy0sbg9/overlay/lib/python3.12/site-packages/setuptools/build_meta.py", line 333, in get_requires_for_build_wheel
+      return self._get_build_requires(config_settings, requirements=[])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/private/var/folders/kb/19zphszs2vb8kdn6tn7bxnz00000gn/T/pip-build-env-xhy0sbg9/overlay/lib/python3.12/site-packages/setuptools/build_meta.py", line 301, in _get_build_requires
+      self.run_setup()
+    File "/private/var/folders/kb/19zphszs2vb8kdn6tn7bxnz00000gn/T/pip-build-env-xhy0sbg9/overlay/lib/python3.12/site-packages/setuptools/build_meta.py", line 317, in run_setup
+      exec(code, locals())
+    File "<string>", line 156, in <module>
+    File "<string>", line 49, in get_config_posix
+    File "<string>", line 28, in find_package_name
+  Exception: Can not find valid pkg-config name.
+  Specify MYSQLCLIENT_CFLAGS and MYSQLCLIENT_LDFLAGS env vars manually
+  error: subprocess-exited-with-error
+  
+  × Getting requirements to build wheel did not run successfully.
+  │ exit code: 1
+  ╰─> See above for output.
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+  full command: /Users/wangtan/workcode/django-vue3-admin-master/django-vue3-admin-master/venv/bin/python3.12 /Users/wangtan/workcode/django-vue3-admin-master/django-vue3-admin-master/venv/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py get_requires_for_build_wheel /var/folders/kb/19zphszs2vb8kdn6tn7bxnz00000gn/T/tmpp9pj25j8
+  cwd: /private/var/folders/kb/19zphszs2vb8kdn6tn7bxnz00000gn/T/pip-install-3gz0nqrz/mysqlclient_327f7cd751484567af55f95106470da4
+  Getting requirements to build wheel: finished with status 'error'
+error: subprocess-exited-with-error
+
+× Getting requirements to build wheel did not run successfully.
+│ exit code: 1
+╰─> See above for output.
+
+note: This error originates from a subprocess, and is likely not a problem with pip.
+
+[notice] A new release of pip is available: 23.2.1 -> 26.0.1
+[notice] To update, run: pip install --upgrade pip
