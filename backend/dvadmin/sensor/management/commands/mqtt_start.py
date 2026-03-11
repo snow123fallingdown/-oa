@@ -20,6 +20,9 @@ MQTT_PASSWORD = ""
 
 logger = logging.getLogger(__name__)
 
+# 从数据库拿取 设备数据（IP、port），修改command 支持循环启动
+
+
 class Command(BaseCommand):
     help = '启动 MQTT 传感器数据监听服务'
 
