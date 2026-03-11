@@ -5,108 +5,92 @@ from datetime import datetime
 import paho.mqtt.client as mqtt
 
 # === 配置区域 ===
-BROKER = "127.0.0.1"
+BROKER = "127.0.0.1" 
 PORT = 1883
-TOPIC = "/device/sensors"
-CLIENT_ID = f"Multi_Sender_{int(time.time())}" 
-INTERVAL = 10  # 发送间隔（秒）：每轮发送后的等待时间
+DEFAULT_TOPIC = "/device/sensors"
+# 保持 Client ID 唯一
+CLIENT_ID = f"SIMULATOR_MSD_{int(time.time())}" 
+INTERVAL = 5 
 
-# 🔴在此处定义你要模拟的所有设备 ID
+# 🔴 设备列表：DID 格式改为 MSD-xxxxxxxx
 DEVICE_LIST = [
-    "TEST-1",
-    "TEST-2",
-    "123456",
-    "551135"
+
+    {"did": "TEST-1", "temp_range": (22.0, 24.0), "pm_range": (10, 30)},
+
+    {"did": "TEST-2", "temp_range": (25.0, 27.0), "pm_range": (40, 60)},
+
+    {"did": "123456", "temp_range": (18.0, 21.0), "pm_range": (5, 15)},
+
+    {"did": "551135", "temp_range": (20.0, 22.0), "pm_range": (20, 45)},
+
+    {"did": "篮球场传感器", "temp_range": (28.0, 32.0), "pm_range": (50, 80)},
+
 ]
 
-# === 模拟数据生成器 ===
-def generate_payload(device_id):
+def generate_payload(device_config):
     """
-    生成符合完整协议的测试数据
-    :param device_id: 当前设备的 DID
+    生成完全符合你所提供 JSON 格式的数据
     """
-    
-    # 模拟不同设备可能处于略微不同的环境，这里依旧使用随机波动
+    did = device_config["did"]
+    t_min, t_max = device_config["temp_range"]
+    p_min, p_max = device_config["pm_range"]
+
+    # 构造符合协议的列表
     data = {
-        "DID": device_id,    # 🔴 使用传入的 device_id
-        "TL": -1,            # 订阅剩余时间
+        "DID": did,
+        "TL": -1,
         "sensor": [
-            # --- 核心环境 ---
-            {"2": "T",          "3": round(random.uniform(20.0, 30.0), 1)},
-            {"2": "HUM",        "3": round(random.uniform(30.0, 70.0), 1)},
-            {"2": " Pressure ", "3": random.randint(100000, 101325)},
-
-            # --- PM 颗粒物 ---
-            {"2": "PM0.3",      "3": round(random.uniform(5, 15), 1)},
-            {"2": "PM0.5",      "3": round(random.uniform(10, 20), 1)},
-            {"2": "PM1",        "3": round(random.uniform(15, 25), 1)},
-            {"2": "PM2.5",      "3": round(random.uniform(20, 60), 1)}, 
-            {"2": "PM4",        "3": round(random.uniform(30, 70), 1)},
-            {"2": "PM10",       "3": round(random.uniform(40, 90), 1)},
-            {"2": "PM100",      "3": round(random.uniform(50, 110), 1)},
-
-            # --- 气体与有机物 ---
-            {"2": "Co2",        "3": random.randint(400, 1500)},
-            {"2": "TVoc",       "3": round(random.uniform(0.01, 0.5), 3)},
-            {"2": "CH2O",       "3": round(random.uniform(0.01, 0.08), 3)},
-            {"2": "Co",         "3": round(random.uniform(0.1, 1.2), 2)},
-            
-            # --- 有害气体 ---
-            {"2": "O3",         "3": round(random.uniform(20, 80), 1)},
-            {"2": "So2",        "3": round(random.uniform(5, 30), 1)},
-            {"2": "No2",        "3": round(random.uniform(10, 40), 1)},
-
-            # --- 设备状态 ---
-            {"2": "RSSI",       "3": random.randint(10, 31)},
+            {"2": "T",           "3": round(random.uniform(t_min, t_max), 1)},
+            {"2": "HUM",         "3": round(random.uniform(30.0, 50.0), 2)},
+            {"2": "Co2",         "3": random.randint(400, 700)},
+            {"2": "TVoc",        "3": round(random.uniform(0.05, 0.15), 3)},
+            {"2": "PM0.3",       "3": round(random.uniform(p_min, p_max), 1)},
+            {"2": "PM0.5",       "3": round(random.uniform(p_min, p_max), 1)},
+            {"2": "PM1",         "3": round(random.uniform(p_min, p_max), 1)},
+            {"2": "PM2.5",       "3": round(random.uniform(p_min, p_max), 1)},
+            {"2": "PM4",         "3": round(random.uniform(p_min, p_max), 1)},
+            {"2": "PM10",        "3": round(random.uniform(p_min, p_max), 1)},
+            {"2": "PM100",       "3": round(random.uniform(p_min, p_max), 1)},
+            {"2": "O3",          "3": random.randint(0, 10)},
+            {"2": "RSSI",        "3": random.randint(20, 31)},
+            {"2": "So2",         "3": random.randint(20, 50)},
+            {"2": "No2",         "3": random.randint(10, 30)},
+            {"2": "CH2O",        "3": round(random.uniform(0.08, 0.12), 3)},
+            {"2": "Co",          "3": round(random.uniform(0.001, 0.01), 3)},
+            {"2": " Pressure ",  "3": random.randint(10000, 12000)}, # 注意前后的空格
+            {"2": "Run counter", "3": random.randint(100, 1000)}
         ]
     }
     return data
 
-# === 主运行逻辑 ===
 def start_simulation():
-    client = mqtt.Client(client_id=CLIENT_ID)
+    # 适配 Paho-MQTT 2.0+，同时兼容 1.x
+    try:
+        client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, client_id=CLIENT_ID)
+    except AttributeError:
+        client = mqtt.Client(client_id=CLIENT_ID)
     
     try:
-        print(f"正在连接到 MQTT Broker ({BROKER})...")
+        print(f"--- 协议适配版模拟器启动 ---")
+        print(f"目标端口: {PORT}")
         client.connect(BROKER, PORT, 60)
         client.loop_start() 
         
-        print(f"连接成功！模拟设备数: {len(DEVICE_LIST)}")
-        print(f"设备列表: {DEVICE_LIST}")
-        print("-" * 50)
-
         while True:
-            print(f"\n--- [ {datetime.now().strftime('%H:%M:%S')} ] 开始新一轮发送 ---")
-            
-            # 🔴 遍历每一个设备
-            for did in DEVICE_LIST:
-                # 1. 生成该设备的数据
-                payload = generate_payload(did)
+            current_time = datetime.now().strftime('%H:%M:%S')
+            for config in DEVICE_LIST:
+                payload = generate_payload(config)
                 payload_str = json.dumps(payload)
                 
-                # 2. 发布消息
-                client.publish(TOPIC, payload_str)
+                # 发布
+                client.publish(DEFAULT_TOPIC, payload_str, qos=1)
                 
-                # 获取关键指标用于日志显示
-                pm25 = next((item['3'] for item in payload['sensor'] if item['2'] == 'PM2.5'), 0)
-                temp = next((item['3'] for item in payload['sensor'] if item['2'] == 'T'), 0)
-                
-                print(f" >> 发送成功: {did:<20} | 温度: {temp} | PM2.5: {pm25}")
-                
-                # 为了防止瞬间并发过高，每个设备之间稍微停顿 0.2秒
-                time.sleep(0.2)
+                print(f"[{current_time}] 已推送数据: {config['did']} -> 1883")
+                time.sleep(0.05) 
 
-            print(f"--- 本轮发送完毕，等待 {INTERVAL} 秒 ---")
-            # 3. 等待下一轮
             time.sleep(INTERVAL)
-
-    except KeyboardInterrupt:
-        print("\n\n>>> 用户停止脚本")
-        client.loop_stop()
-        client.disconnect()
     except Exception as e:
-        print(f"\n!!! 发生错误: {e}")
-        client.loop_stop()
+        print(f"错误: {e}")
 
 if __name__ == "__main__":
     start_simulation()
